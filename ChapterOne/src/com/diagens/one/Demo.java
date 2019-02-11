@@ -7,5 +7,6 @@ package com.diagens.one;
 public class Demo {
     public static void main(String[] args) {
         System.out.println("Hello,World");
+        System.getProperties().list(System.out);
     }
 }
