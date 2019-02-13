@@ -12,4 +12,10 @@ public class Demo {
         //内部加载的顺序
         House house=new House();
     }
+
+    @Test
+    public void test2(){
+       TestStatic.printStr();
+    }
+
 }
