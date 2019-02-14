@@ -6,6 +6,6 @@ package com.diagens.three;
  */
 public class Demo {
     public static void main(String[] args) {
-        System.out.println(45%90);
+        C c = new C("ss");
     }
 }
