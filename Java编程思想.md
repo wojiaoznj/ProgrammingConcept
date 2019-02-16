@@ -16,34 +16,41 @@
    4. 静态域：存放静态成员（static定义的） 
    5. 常量池：存放字符串常量和基本类型常量（public static final）。
    6. 非RAM存储：硬盘等永久存储空间
- 
-#2.域与静态方法
+
+
+
+##2域与静态方法
+
    1.子类继承父类时，只有普通的方法调用可以是多态的
+
+```java
+ public class Father{
+   public int field=0;
    
-     ```
-     public class Father{
-       public int field=0;
-       
-       public void name(){
-          System.out.println("Father()...");
-       }
-     }
-     
-     class Son extends Father{
-       public int field=1;
-       
-       public void name(){
-         System.out.println("Son()...");
-       
-       public static void main(String[] args){
-         Father father=new Son();
-         System.out.println(father.field); //0
-         System.out.println(father.name()); //Son()...
-       }
-     }
-     
-   2.如果某个方法是静态的，它的行为就不具有多态
-   ```
+   public void name(){
+      System.out.println("Father()...");
+   }
+ }
+ 
+ class Son extends Father{
+   public int field=1;
+   
+   public void name(){
+     System.out.println("Son()...");
+   
+   public static void main(String[] args){
+     Father father=new Son();
+     System.out.println(father.field); //0
+     System.out.println(father.name()); //Son()...
+   }
+ }
+```
+
+   
+
+ 2.如果某个方法是静态的，它的行为就不具有多态
+
+   ```java
    class  StaticSuper{
      public static String staticGet(){
        return "Base staticGet()";
@@ -70,5 +77,12 @@
        System.out.println(sup.dynamicGet()); //Derived dynamicGet()
      }
    }
-   
-   
+   ```
+
+
+
+3.一个类加载的顺序，如果他继承了一个父类，
+
+​      首先加载父类，父类中有静态属性或方法先加载静态域，之后在加载成员变量和成员方法，最后加载构造器。
+
+​      父类构造器加载完毕后，加载子类的静态域，加载子类的成员变量和方法，最后加载构造器。
