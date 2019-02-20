@@ -1,4 +1,4 @@
-package com.diagens.five;
+package com.diagens.four;
 
 /**
  * @author ZNJ
@@ -19,7 +19,6 @@ public class Parcel {
 
     protected class PDestination implements Destination{
         private String name;
-        @Override
         public String readLabel() {
             Parcel parcel=new Parcel();
             parcel.name="Hello,World";

@@ -1,30 +1,16 @@
 package com.diagens.six;
 
-import com.sun.org.apache.regexp.internal.RE;
-
 /**
  * @author ZNJ
- * @create 2019/2/19-23:41
+ * @create 2019-02-20 10:17
  */
 public class ParcelSix {
-    public Destination destination(String s){
-        class PDestination implements Destination{
-            private String label;
-
-            public PDestination(String label) {
-                this.label = label;
+    //匿名内部类，使用外部类的方法参数时，参数必须为final
+    public Base pdase(final String name){
+        return new Base(name){
+            public void printStr(){
+                System.out.println(name);
             }
-
-            @Override
-            public String readLabel() {
-                return label;
-            }
-        }
-        return new PDestination(s);
-    }
-
-    public static void main(String[] args) {
-        ParcelSix ps=new ParcelSix();
-        ps.destination("Hello,World");
+        };
     }
 }
