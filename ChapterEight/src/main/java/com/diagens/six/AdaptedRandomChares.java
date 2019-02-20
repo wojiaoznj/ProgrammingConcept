@@ -1,4 +1,4 @@
-package com.diagens.seven;
+package com.diagens.six;
 
 import java.io.IOException;
 import java.nio.CharBuffer;
