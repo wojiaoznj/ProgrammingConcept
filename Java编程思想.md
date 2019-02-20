@@ -89,71 +89,35 @@
 
 
 
-## 3.内部类
+## 3.在方法和作用域内的内部类
 
-  **1.定义在方法的类(局部内部类)**
+  1.定义在方法的类(局部内部类)
 
-```java
+         ```java
 public class ParcelSix {
-
     public Destination destination(String s){
-
         class PDestination implements Destination{
+            private String label;
 
-        private String label;
+            public PDestination(String label) {
+                this.label = label;
+            }
 
-        public PDestination(String label) {
-            this.label = label;
+            @Override
+            public String readLabel() {
+                return label;
+            }
         }
-
-        @Override
-        public String readLabel() {
-            return label;
-        }
+        return new PDestination(s);
     }
-    return new PDestination(s);
-}
 
-public static void main(String[] args) {
-    ParcelSix ps=new ParcelSix();
-    ps.destination("Hello,World");
+    public static void main(String[] args) {
+        ParcelSix ps=new ParcelSix();
+        ps.destination("Hello,World");
+    }
 }
-```
-}
-
+         ```
 
  PDestination类是destination()方法的一部分，而不是ParcelSix的一部分，所以在destination()之外不能访问PDestination
 
  注意出现在return语句中的向上转型——返回的是Destination的引用，它是PDestination的基类。
-
-匿名内部类，继承的基类只有一个带参构造器时，使用方法的参数时，参数必须为final。
-
-
-
-**2.嵌套类**
-
-   1).要创建嵌套类的对象，并不需要其外围类的对象。
-
-   2).不能从嵌套类的对象中访问非静态的外围类对象。
-
-   嵌套类与普通的内部类的还有一个区别。普通内部类的字段与方法，只能放在类的外部层次上，所以普通的内部类不能
-
-   有static数据和static字段，也不能包含嵌套类。但嵌套类可以包含所有这些东西。
-
-
-
-**3.为什么需要内部类**
-
- 每个内部类都能独立地继承自一个(接口的)实现，所以无论外围类是否已经继承了某个(接口的)实现，对于内部类都没有
-
- 影响。接口解决了部分问题，而内部类有效地实现了"多重继承"。也就是说，内部类允许继承多个非接口类型(类或抽
-
- 象类)。好处如下:
-
-​    1).利用其外部类的方法创建并返回内部类实例，隐藏你不想让别人知道的操作。
-
-​    2).一个内部类对象可以访问创建它的外部类对象的内容，甚至包括私有变量。
-
-
-
-   
