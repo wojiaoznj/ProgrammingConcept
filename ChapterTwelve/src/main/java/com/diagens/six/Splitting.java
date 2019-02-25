@@ -48,5 +48,18 @@ public class Splitting {
         //以下划线替换元音字母(aeiou)
         System.out.println(knights.replaceAll("(a|e|i|o|u)+","_"));
     }
+
+    @Test
+    public void test5(){
+        String str="Java now has regular expressions";
+        System.out.println(str.matches("^Java"));
+        System.out.println(str.matches("\\Breg.*"));
+        System.out.println(str.matches("n.w\\s+h(a|i)s"));
+        System.out.println(str.matches("s?"));
+        System.out.println(str.matches("s*"));
+        System.out.println(str.matches("s+"));
+        System.out.println(str.matches("s{4}"));
+        System.out.println(str.matches("s{0,3}"));
+    }
     
 }
