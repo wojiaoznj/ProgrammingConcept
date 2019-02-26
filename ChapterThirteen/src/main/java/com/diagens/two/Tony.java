@@ -1,4 +1,4 @@
-package com.diagens;
+package com.diagens.two;
 
 /**
  * @author ZNJ

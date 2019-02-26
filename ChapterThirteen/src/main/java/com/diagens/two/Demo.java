@@ -1,4 +1,4 @@
-package com.diagens;
+package com.diagens.two;
 
 import org.junit.jupiter.api.Test;
 
@@ -8,20 +8,22 @@ import org.junit.jupiter.api.Test;
  */
 public class Demo {
     static void printInfo(Class cc) {
-        //getName产生全限定的类名，isInstance是否是表示为接口
+        //getName产生全限定的类名，isInterface是否是表示为接口
         System.out.println("Class name:" + cc.getName() + " is interface?" +
-                "[" + cc.isInstance(cc)+ "]");
+                "[" + cc.isInterface()+ "]");
         //getSimpleName不包含包名的类名
         System.out.println("Simple name:"+cc.getSimpleName());
         //getCanonicalName产生全限定的类名
         System.out.println("Canonical name:"+cc.getCanonicalName());
+        System.out.println(new FancyToy().getClass());
+        System.out.println(FancyToy.class);
     }
 
     @Test
     public void test1(){
         Class c=null;
         try{
-           c=Class.forName("com.diagens.FancyToy");
+           c=Class.forName("com.diagens.two.FancyToy");
         } catch(Exception e){
             System.out.println("Can't find FancyToy");
         }
