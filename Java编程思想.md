@@ -243,3 +243,244 @@ public class BigEgg extends Egg{
 ​                    c.初始化，如果该类具有超类，则对其初始化执行静态初始化器和静态初始化。
 
 ​            初始化被延迟到了对静态方法(构造器隐式地是静态的)或者非常数静态域进行首次引用时才执行。
+
+
+
+## 6.容器深入研究
+
+​        1.当在HashMap中使用自己的类作为键时，需要注意:
+
+​              1).当两个对象里面的内容相同时，将两个对象加入时，对象的键不会被相互覆盖
+
+​              2).问题出在HashMap的键是先对比键的散列码，自定义的类会继承自基类Object,而Object默认是使用
+
+​                  对象的地址计算散列码。
+
+​              3).当你在类中覆盖hashCode()方法后，还是无法正常运行，因为HashMap中，是先以hashCode值做
+
+​                  对比，在使用equals方法进行对比，在这里的equals方法也是Object自定义的，对比的也是对象的地址。
+
+​                  所以还需重写equals方法。
+
+​                 **正确的equals()方法必须满足5个条件:**
+
+​                      a.自反性。对任意x，x.equals(x)一定返回true
+
+​                      b.对称性。对任意x和y，如果y.equals(x)返回是true，那么x.equals(y)返回的也是true。
+
+​                      c.一致性。对任意的x和y，如果用于对比的信息没有发生改变，那么无论调用多少次，返回结果与第一
+
+​                        次一致。
+
+​                      d.对任何不是null的x，x.equals(null)一定返回false.
+
+​          2.为速度而散列
+
+​                     如果键没有按照任何特定顺序保存，所以只能使用简单的线性查询，而线性查询是最慢的查询方法。
+
+​                     散列的价值在于速度：散列使得查询得以快速进行。由于瓶颈位于键的查询速度，因此解决方法之一就是
+
+​                     保持键的排序状态，然后使用Collection.binarySearch()进行查询。
+
+​                     散列则更进一步，他将键保存在某处，以便能够很快找到。存储一组元素最快的数据结构是数组，所以使用
+
+​                     他来表示键的信息(键的信息，不是键本身)，但是因为数组的容量是固定的，而我们想保存的数量并不确定
+
+​                     其实数组并不保存键本身，而是通过键对象生成一个数字，将其作为数组的下标，这个数字就是散列码，由
+
+​                     定义在Object中的、且可能由你的类覆盖的hashCode()方法生成。
+
+​                     为解决数组容量被固定的问题，相同的键可以产生相同的下标，而不同的键也可能会产生相同的下标，这就 
+
+​                     导致了冲突的产生，数组并不直接保存值，而是保存值的list,采用数组加链表的实现方式，相同的键中可能
+
+​                     有不同的值，然后对list中的值采用equals()方法进行线性的查询，虽然比较慢，但是只对很少的元素比较。
+
+## 7.线程状态
+
+​           1).新建(new)：当线程被创建时，它只会短暂地处于这种状态。此时它已经分配了必须的系统资源，并执行了初始
+
+​                化。此刻线程已经有资格获得CPU时间了，之后调度器将把这个线程转变为可运行状态或阻塞状态。
+
+​            2).就绪(Runnable)：在这种状态下，只要调度器把时间片分配给线程，线程就可以运行。也就是说，在任意时刻
+
+​                线程可以运行也可以不运行。只要调度器能分配时间片给线程，他就可以运行；这不同于死和阻塞状态。
+
+​           3).阻塞(Blocked):线程能够运行，但有某个条件阻止它的运行。当线程处于阻塞状态时，调度器将忽略线程，不会
+
+​                分配给线程任何CPU时间。直到线程重新进入了就绪状态，它才有可能执行操作。
+
+​           4).死亡(Dead):处于死亡或终止状态的线程将不再是可调度的，并且再也不会得到CPU时间，它的任务已结束，或
+
+​                不再是可运行的。任务死亡的通常方式是从run()方法返回，但是任务的线程还可以被中断。
+
+​            **进入阻塞状态**
+
+​                      一个任务进入阻塞状态，可能有如下原因:
+
+​                      1).通过调用sleep(milliseconds)使任务进入休眠状态，在这种情况下，任务在指定的时间内不会运行。
+
+​                      2).你通过调用wait()使线程挂起。直到线程得到了notify()或notifyAll()消息,线程才会进入就绪状态。
+
+​                      3).任务在等待某个输入/输出完成。
+
+​                      4).任务试图在某个对象上调用其同步控制方法，但是对象锁不可用，因为另一个任务已经获取了这个锁。
+
+## 8.线程死锁
+
+​              共享资源类
+
+```java
+package com.diagens.five.dielock;
+
+/**
+ * @author ZNJ
+ * @create 2019-03-29 13:17
+ */
+public class Chopstick {
+    private boolean taken=false;
+
+    //拿起筷子
+    public synchronized void take() throws InterruptedException {
+        while (taken){
+            wait();
+        }
+        taken=true;
+    }
+
+    //放下筷子
+    public synchronized void drop(){
+        taken=false;
+        notifyAll();
+    }
+}
+
+```
+
+​               执行任务者
+
+```java
+package com.diagens.five.dielock;
+
+import java.util.Random;
+import java.util.concurrent.TimeUnit;
+
+/**
+ * @author ZNJ
+ * @create 2019-03-29 13:19
+ */
+//每个哲学家要左右两个筷子
+//每次吃饭前会思考一会
+//一共只有五根筷子
+//一共五个哲学家，等待别人吃完以后放下筷子，它才能吃
+public class Philosopher implements Runnable {
+    private Chopstick left;
+    private Chopstick right;
+    private final int id;
+    private final int ponderFactor;
+    private Random random=new Random(47);
+
+    private void pause() throws InterruptedException {
+        if(ponderFactor==0){
+            return;
+        }
+        TimeUnit.MILLISECONDS.sleep(random.nextInt(ponderFactor*250));
+    }
+    public Philosopher(Chopstick left, Chopstick right, int id, int ponderFactor) {
+        this.left = left;
+        this.right = right;
+        this.id = id;
+        this.ponderFactor = ponderFactor;
+    }
+
+    public void run() {
+        try {
+            while (!Thread.interrupted()){
+                System.out.println(this+" thinking");
+                pause();
+                System.out.println(this+" grabbing right");
+                right.take();
+                System.out.println(this+" grabbing left");
+                left.take();
+                System.out.println(this+" eating");
+                pause();
+                right.drop();
+                left.drop();
+            }
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public String toString() {
+        return "Philosopher{" +
+                "id=" + id +
+                '}';
+    }
+}
+```
+
+​        产生死锁
+
+````java
+package com.diagens.five.dielock;
+
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
+
+/**
+ * @author ZNJ
+ * @create 2019-03-29 13:26
+ */
+//产生死锁
+//哲学家思考的时间过短
+//一起来争抢筷子，会造成的情况是，每个人手里一只筷子
+//但都不能吃饭，同时都在等待另一个人吃完饭放下筷子
+public class DeadlockingDiningPhilosophers {
+    public static void main(String [] args) throws InterruptedException {
+        int size=5;
+        int ponder=0;
+        ExecutorService service = Executors.newCachedThreadPool();
+        Chopstick[] chopsticks = new Chopstick[5];
+        for (int i = 0; i < size; i++) {
+            chopsticks[i]=new Chopstick();
+        }
+        for (int i = 0; i < size; i++) {
+            service.execute(new Philosopher(chopsticks[i],chopsticks[(i+1)%size],i,ponder));
+        }
+        TimeUnit.SECONDS.sleep(10);
+        service.shutdownNow();
+    }
+}
+
+````
+
+​      产生死锁条件:
+
+​                1).互斥条件。
+
+​                    任务使用的资源中至少一个是不能共享的。这里，一根Chopstick一次就只能被一个Philosopher使用
+
+​                 2).至少一个任务必须持有一个资源且正在等待获取一个当前被别的任务持有的资源。也就是说，要发生
+
+​                     死锁，Philosopher必须拿着一根Chopstick并且等待另一根。
+
+​                 3).资源不能被任务抢占，任务必须把资源释放当作普通条件，Philosopher很有礼貌，他们不会从其他
+
+​                     Philosopher那里抢占Chopstick。
+
+​                  4).必须有循环等待。这时，一个任务等待其他任务所持有的资源，后者又在等待另一个任务所持有的资源
+
+​                      这样一直下去，直到有一个任务在等待第一个任务所持有的资源，使得大家都被锁住。在
+
+​                      DeadlockingDiningPhilosophers中，因为每个Philosopher都试图先得到右边的Chopstick，然后得到左边
+
+​                      的Chopstick，所以发生了循环等待。
+
+​       解决方案:
+
+​                 让最后一个Philosopher拿Chopstick的顺序改变，这样第一个Philosopher就能拿到最后一根Chopstick，就不会
+
+​                 产生死锁。
